@@ -7,8 +7,7 @@ import openai
 import os
 
 SAMPLE_PROMPT = """
-Write a pull request description focusing on the motivation behind the change and why it improves the project.
-Go straight to the point.
+Write a pull request description clearly states the purpose of the pull request and references the relevant JIRA issue, followed by a summary of the changes made listed in a structured manner, providing a comprehensive overview of the modifications. Reviewers can easily understand the intent of the pull request, allowing for a more efficient code review process.
 
 The title of the pull request is "Enable valgrind on CI" and the following changes took place: 
 
@@ -40,7 +39,7 @@ Changes in file test/CommandParserTest.cpp: @@ -566,7 +566,7 @@ TEST(CommandPars
 """
 
 GOOD_SAMPLE_RESPONSE = """
-Currently, our CI build does not include Valgrind as part of the build and test process. Valgrind is a powerful tool for detecting memory errors, and its use is essential for maintaining the integrity of our project.
+## Description
 This pull request adds Valgrind to the CI build, so that any memory errors will be detected and reported immediately. This will help to prevent undetected memory errors from making it into the production build.
 
 Overall, this change will improve the quality of the project by helping us detect and prevent memory errors.
