@@ -7,9 +7,7 @@ import openai
 import os
 
 SAMPLE_PROMPT = """
-Write a pull request description clearly states the purpose of the pull request and references the relevant JIRA issue, followed by a summary of the changes made listed in a structured manner, providing a comprehensive overview of the modifications. Reviewers can easily understand the intent of the pull request, allowing for a more efficient code review process.
-
-The title of the pull request is "Enable valgrind on CI" and the following changes took place: 
+The title of the pull request is "Enable valgrind on CI [WEB-124]" and the following changes took place: 
 
 Changes in file .github/workflows/build-ut-coverage.yml: @@ -24,6 +24,7 @@ jobs:
          run: |
@@ -40,9 +38,32 @@ Changes in file test/CommandParserTest.cpp: @@ -566,7 +566,7 @@ TEST(CommandPars
 
 GOOD_SAMPLE_RESPONSE = """
 ## Description
-This pull request adds Valgrind to the CI build, so that any memory errors will be detected and reported immediately. This will help to prevent undetected memory errors from making it into the production build.
+This pull request adds a new feature that allows users to reset their passwords directly from the login screen. 
 
-Overall, this change will improve the quality of the project by helping us detect and prevent memory errors.
+## Changes Made
+- Added a "Forgot Password" link on the login screen
+- Implemented the logic for users to reset their passwords via email
+- Updated the database schema to store password reset tokens
+
+## Screenshots
+![Login Screen with Forgot Password Link](/screenshots/login_screen.png)
+
+## How to Test
+1. Click on the "Forgot Password" link on the login screen
+2. Enter your email address and submit the form
+3. Check your email for a password reset link
+4. Click on the reset link and follow the instructions
+5. Log in with your new password 
+
+## Risk Level
+Low - This feature has been thoroughly tested and reviewed.
+
+## Dependencies
+- Utilizes the email service to send password reset links
+- Relies on the backend API for processing password resets
+
+## Related Issues
+Closes [WEB-124](https://edglrd.atlassian.net/jira/software/c/projects/WEB/issues/WEB-124)
 """
 
 
@@ -92,7 +113,7 @@ def main():
         allowed_users = allowed_users.split(",")
     open_ai_model = os.environ.get("INPUT_OPENAI_MODEL", "gpt-3.5-turbo")
     max_prompt_tokens = int(os.environ.get("INPUT_MAX_TOKENS", "1000"))
-    model_temperature = float(os.environ.get("INPUT_TEMPERATURE", "0.6"))
+    model_temperature = float(os.environ.get("INPUT_TEMPERATURE", "1.0"))
     model_sample_prompt = os.environ.get("INPUT_MODEL_SAMPLE_PROMPT", SAMPLE_PROMPT)
     model_sample_response = os.environ.get(
         "INPUT_MODEL_SAMPLE_RESPONSE", GOOD_SAMPLE_RESPONSE
@@ -152,12 +173,7 @@ def main():
 
         pull_request_files.extend(pull_files_chunk)
 
-        completion_prompt = f"""
-Write a pull request description focusing on the motivation behind the change and why it improves the project.
-Go straight to the point.
-
-The title of the pull request is "{pull_request_title}" and the following changes took place: \n
-"""
+        completion_prompt = f"""The title of the pull request is "{pull_request_title}" and the following changes took place: \n"""
     for pull_request_file in pull_request_files:
         # Not all PR file metadata entries may contain a patch section
         # For example, entries related to removed binary files may not contain it
@@ -180,7 +196,7 @@ The title of the pull request is "{pull_request_title}" and the following change
         messages=[
             {
                 "role": "system",
-                "content": "You are a helpful assistant who writes pull request descriptions",
+                "content": "You are a Senior Software Engineer who writes pull request descriptions",
             },
             {"role": "user", "content": model_sample_prompt},
             {"role": "assistant", "content": model_sample_response},
