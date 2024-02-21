@@ -4,11 +4,68 @@ import requests
 import argparse
 import json
 import openai
-import yaml
+import os
 
-config = {} 
-with open("config.yml", "r") as stream:
-    config = yaml.safe_load(stream)
+SAMPLE_PROMPT = """
+The title of the pull request is "Enable valgrind on CI [WEB-124]" and the following changes took place: 
+
+Changes in file .github/workflows/build-ut-coverage.yml: @@ -24,6 +24,7 @@ jobs:
+         run: |
+           sudo apt-get update
+           sudo apt-get install -y lcov
++          sudo apt-get install -y valgrind
+           sudo apt-get install -y ${{ matrix.compiler.cc }}
+           sudo apt-get install -y ${{ matrix.compiler.cxx }}
+       - name: Checkout repository
+@@ -48,3 +49,7 @@ jobs:
+         with:
+           files: coverage.info
+           fail_ci_if_error: true
++      - name: Run valgrind
++        run: |
++          valgrind --tool=memcheck --leak-check=full --leak-resolution=med \
++            --track-origins=yes --vgdb=no --error-exitcode=1 ${build_dir}/test/command_parser_test
+Changes in file test/CommandParserTest.cpp: @@ -566,7 +566,7 @@ TEST(CommandParserTest, ParsedCommandImpl_WhenArgumentIsSupportedNumericTypeWill
+     unsigned long long expectedUnsignedLongLong { std::numeric_limits<unsigned long long>::max() };
+     float expectedFloat { -164223.123f }; // std::to_string does not play well with floating point min()
+     double expectedDouble { std::numeric_limits<double>::max() };
+-    long double expectedLongDouble { std::numeric_limits<long double>::max() };
++    long double expectedLongDouble { 123455678912349.1245678912349L };
+ 
+     auto command = UnparsedCommand::create(expectedCommand, "dummyDescription"s)
+                        .withArgs<int, long, unsigned long, long long, unsigned long long, float, double, long double>();
+"""
+
+GOOD_SAMPLE_RESPONSE = """
+## Description
+This pull request adds a new feature that allows users to reset their passwords directly from the login screen. 
+
+## Changes Made
+- Added a "Forgot Password" link on the login screen
+- Implemented the logic for users to reset their passwords via email
+- Updated the database schema to store password reset tokens
+
+## Screenshots
+![Login Screen with Forgot Password Link](/screenshots/login_screen.png)
+
+## How to Test
+1. Click on the "Forgot Password" link on the login screen
+2. Enter your email address and submit the form
+3. Check your email for a password reset link
+4. Click on the reset link and follow the instructions
+5. Log in with your new password 
+
+## Risk Level
+Low - This feature has been thoroughly tested and reviewed.
+
+## Dependencies
+- Utilizes the email service to send password reset links
+- Relies on the backend API for processing password resets
+
+## Related Issues
+Closes [WEB-124](https://edglrd.atlassian.net/jira/software/c/projects/WEB/issues/WEB-124)
+"""
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -38,6 +95,12 @@ def main():
         required=True,
         help="The OpenAI API key",
     )
+    parser.add_argument(
+        "--allowed-users",
+        type=str,
+        required=False,
+        help="A comma-separated list of GitHub usernames that are allowed to trigger the action, empty or missing means all users are allowed",
+    )
     args = parser.parse_args()
 
     github_api_url = args.github_api_url
@@ -45,19 +108,16 @@ def main():
     github_token = args.github_token
     pull_request_id = args.pull_request_id
     openai_api_key = args.openai_api_key
-    allowed_users = config.get("allowed_users")
+    allowed_users = os.environ.get("INPUT_ALLOWED_USERS", "")
     if allowed_users:
         allowed_users = allowed_users.split(",")
-    open_ai_model = config.get("openai_model")
-    max_prompt_tokens = int(config.get("max_tokens"))
-    model_temperature = float(config.get("model_temperature"))
-
-    with open('model_sample_prompt.txt', 'r') as file:
-        model_sample_prompt = file.read()
-    with open('model_sample_response.txt', 'r') as file:
-        model_sample_response = file.read()
-    with open('model_system_prompt.txt', 'r') as file:
-        model_system_prompt = file.read()
+    open_ai_model = os.environ.get("INPUT_OPENAI_MODEL", "gpt-3.5-turbo")
+    max_prompt_tokens = int(os.environ.get("INPUT_MAX_TOKENS", "1000"))
+    model_temperature = float(os.environ.get("INPUT_TEMPERATURE", "1.0"))
+    model_sample_prompt = os.environ.get("INPUT_MODEL_SAMPLE_PROMPT", SAMPLE_PROMPT)
+    model_sample_response = os.environ.get(
+        "INPUT_MODEL_SAMPLE_RESPONSE", GOOD_SAMPLE_RESPONSE
+    )
     authorization_header = {
         "Accept": "application/vnd.github.v3+json",
         "Authorization": "token %s" % github_token,
@@ -136,7 +196,7 @@ def main():
         messages=[
             {
                 "role": "system",
-                "content": model_system_prompt,
+                "content": "You are a Senior Software Engineer who writes pull request descriptions",
             },
             {"role": "user", "content": model_sample_prompt},
             {"role": "assistant", "content": model_sample_response},
