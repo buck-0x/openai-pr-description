@@ -191,7 +191,7 @@ def main():
         completion_prompt = completion_prompt[:max_allowed_characters]
 
     openai.api_key = openai_api_key
-    openai_response = openai.ChatCompletion.create(
+    openai_response = openai.chat.completions.create(
         model=open_ai_model,
         messages=[
             {
