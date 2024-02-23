@@ -42,6 +42,8 @@ jobs:
           openai_api_key: ${{ secrets.OPENAI_API_KEY }}
 ```
 
+## Variables
+
 | Input             | Description                                           | Required | Default                    |
 | ----------------- | ----------------------------------------------------- | -------- | -------------------------- |
 | `github_token`    | The GitHub token to use for the Action                | Yes      |                            |
@@ -49,11 +51,18 @@ jobs:
 | `pull_request_id` | The ID of the pull request to use                     | No       | Extracted from metadata    |
 | `openai_model`    | The [OpenAI model] to use                             | No       | `gpt-3.5-turbo`            |
 | `max_tokens`      | The maximum number of **prompt tokens** to use        | No       | `1000`                     |
-| `temperature`     | Higher values will make the model more creative (0-2) | No       | `0.6`                      |
+| `temperature`     | Higher values will make the model more creative (0-2) | No       | `1.0`                      |
 | `system_prompt`   | The prompt to use for giving context to the model     | No       | See action.yml             |
 | `sample_prompt`   | The prompt to use for giving context to the model     | No       | See action.yml             |
 | `sample_response` | A sample response for giving context to the model     | No       | See action.yml             |
 
+### Customizing OpenAI variables (Admin only)
+
+1. Go to Organization (to set for all repositories using the action) or Repository (for a specific repository) settings on GitHub
+2. In `Secrets and variables`, create a new variable (e.g. `INPUT_SYSTEM_PROMPT` for `system_prompt`) and enter a new value
+3. The new value will be used instead of the default defined in action.yml
+
+### Other info
 
 [OpenAI API key]: https://help.openai.com/en/articles/4936850-where-do-i-find-my-secret-api-key
 [OpenAI model]: https://platform.openai.com/docs/models
