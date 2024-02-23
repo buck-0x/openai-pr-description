@@ -1,4 +1,4 @@
-# `platisd/openai-pr-description` GitHub Action
+# `EDGLRD/openai-pr-description` GitHub Action
 
 Autofill the description of your pull requests with the power of OpenAI!
 
@@ -6,7 +6,7 @@ Autofill the description of your pull requests with the power of OpenAI!
 
 ## What does it do?
 
-`platisd/openai-pr-description` is a GitHub Action that looks at the title as well as the contents
+`EDGLRD/openai-pr-description` is a GitHub Action that looks at the title as well as the contents
 of your pull request and uses the [OpenAI API](https://openai.com/blog/openai-api) to automatically
 fill up the description of your pull request. Just like ChatGPT would! 🎉<br>
 The Action tries to focus on **why** the changes are needed rather on **what** they are,
@@ -36,7 +36,7 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-      - uses: platisd/openai-pr-description@master
+      - uses: EDGLRD/openai-pr-description@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           openai_api_key: ${{ secrets.OPENAI_API_KEY }}
@@ -50,8 +50,9 @@ jobs:
 | `openai_model`    | The [OpenAI model] to use                             | No       | `gpt-3.5-turbo`            |
 | `max_tokens`      | The maximum number of **prompt tokens** to use        | No       | `1000`                     |
 | `temperature`     | Higher values will make the model more creative (0-2) | No       | `0.6`                      |
-| `sample_prompt`   | The prompt to use for giving context to the model     | No       | See `SAMPLE_PROMPT`        |
-| `sample_response` | A sample response for giving context to the model     | No       | See `GOOD_SAMPLE_RESPONSE` |
+| `system_prompt`   | The prompt to use for giving context to the model     | No       | See action.yml             |
+| `sample_prompt`   | The prompt to use for giving context to the model     | No       | See action.yml             |
+| `sample_response` | A sample response for giving context to the model     | No       | See action.yml             |
 
 
 [OpenAI API key]: https://help.openai.com/en/articles/4936850-where-do-i-find-my-secret-api-key
