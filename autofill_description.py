@@ -53,9 +53,9 @@ def main():
     open_ai_model = os.environ.get("INPUT_OPENAI_MODEL")
     max_prompt_tokens = int(os.environ.get("INPUT_MAX_TOKENS"))
     model_temperature = float(os.environ.get("INPUT_TEMPERATURE"))
-    model_sample_prompt = os.environ.get("INPUT_MODEL_SAMPLE_PROMPT")
-    model_sample_response = os.environ.get("INPUT_MODEL_SAMPLE_RESPONSE")
-    model_system_prompt = os.environ.get("INPUT_MODEL_SYSTEM_PROMPT")
+    model_sample_prompt = os.environ.get("INPUT_SAMPLE_PROMPT")
+    model_sample_response = os.environ.get("INPUT_SAMPLE_RESPONSE")
+    model_system_prompt = os.environ.get("INPUT_SYSTEM_PROMPT")
     authorization_header = {
         "Accept": "application/vnd.github.v3+json",
         "Authorization": "token %s" % github_token,
