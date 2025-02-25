@@ -4,8 +4,7 @@ Autofill the description of your pull requests with the power of OpenAI.
 
 ## What does it do?
 
-`EDGLRD/openai-pr-description` is a GitHub Action that looks at the title as well as the contents
-of your pull request and uses the [OpenAI API](https://openai.com/blog/openai-api) to generate the description of your pull request.
+A GitHub Action that looks at the title as well as the contents of your pull request and uses the [OpenAI API](https://openai.com/blog/openai-api) to generate the description of your pull request.
 
 The GitHub Action will only run when a PR description is not already provided.
 In other words it will not accidentally overwrite your existing description.
@@ -14,8 +13,6 @@ The idea is this Action will save you the time and trouble of writing **meaningf
 **NOTE: You still must manually review and modify the PR description before submitting!**
 
 For information on customizing OpenAI variables as an admin, refer to the [Customizing OpenAI variables (Admin only)](#customizing-openai-variables-admin-only) section.
-
-The cost is around ~$0.10 for 15-20 pull requests when using gpt-3.5.
 
 ## How can you use it?
 
@@ -33,7 +30,7 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-      - uses: EDGLRD/openai-pr-description@master
+      - uses: buck-0x/openai-pr-description@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           openai_api_key: ${{ secrets.OPENAI_API_KEY }}
@@ -53,7 +50,7 @@ jobs:
 
 | Input             | Description                                           | Default                    |
 | ----------------- | ----------------------------------------------------- | -------------------------- |
-| `openai_model`    | The [OpenAI model](https://platform.openai.com/docs/models) to use                             | `gpt-3.5-turbo`            |
+| `openai_model`    | The [OpenAI model](https://platform.openai.com/docs/models) to use                             | `gpt-4o-mini`            |
 | `max_tokens`      | The maximum number of **prompt tokens** to use        | `1000`                     |
 | `temperature`     | Higher values will make the model more creative (0-2) | `1.0`                      |
 | `system_prompt`   | The high-level system prompt to use for giving context to the model     | See [action.yml](action.yml)             |

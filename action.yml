@@ -18,7 +18,7 @@ inputs:
   openai_model:
     description: 'OpenAI model to use, needs to be compatible with the chat/completions endpoint'
     required: false
-    default: 'gpt-3.5-turbo'
+    default: 'gpt-4o-mini'
   max_tokens:
     description: 'Maximum number of prompt tokens to use'
     required: false
@@ -92,7 +92,7 @@ inputs:
       - Relies on the backend API for processing password resets
 
       ## Related Issues
-      Closes [WEB-124](https://edglrd.atlassian.net/jira/software/c/projects/WEB/issues/WEB-124)
+      Closes [WEB-124]
 runs:
   using: 'docker'
   image: 'Dockerfile'
